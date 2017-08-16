@@ -739,6 +739,10 @@ func (c *config) LibartImgHostBaseAddress() string {
 }
 
 func (c *config) LibartImgDeviceBaseAddress() string {
+	if c.productVariables.Libart_img_base != nil &&
+		*c.productVariables.Libart_img_base != "" {
+		return *c.productVariables.Libart_img_base
+	}
 	archType := Common
 	if len(c.Targets[Android]) > 0 {
 		archType = c.Targets[Android][0].Arch.ArchType

@@ -201,6 +201,7 @@ type productVariables struct {
 	Use_lmkd_stats_log               *bool `json:",omitempty"`
 	Arc                              *bool `json:",omitempty"`
 	MinimizeJavaDebugInfo            *bool `json:",omitempty"`
+	Libart_img_base                  *string `json:",omitempty"`
 
 	Check_elf_files *bool `json:",omitempty"`
 
