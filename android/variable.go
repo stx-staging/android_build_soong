@@ -20,6 +20,8 @@ import (
 	"runtime"
 	"strings"
 
+	"statix/soong/android"
+
 	"github.com/google/blueprint/proptools"
 )
 
@@ -124,6 +126,9 @@ type variableProperties struct {
 			Static_libs  []string
 			Srcs         []string
 		}
+
+		// include Statix variables
+		*android.Product_variables
 	} `android:"arch_variant"`
 }
 
@@ -288,6 +293,9 @@ type productVariables struct {
 	ProductHiddenAPIStubsTest   []string `json:",omitempty"`
 
 	TargetFSConfigGen []string `json:",omitempty"`
+
+	// include Statix variables
+	*android.ProductVariables
 }
 
 func boolPtr(v bool) *bool {
