@@ -20,6 +20,8 @@ import (
 	"runtime"
 	"strings"
 
+	"statix/soong/android"
+
 	"github.com/google/blueprint/proptools"
 )
 
@@ -131,6 +133,8 @@ type variableProperties struct {
 			Srcs         []string `android:"arch_variant"`
 			Exclude_srcs []string `android:"arch_variant"`
 		} `android:"arch_variant"`
+		// include Statix variables
+		*android.Product_variables
 	} `android:"arch_variant"`
 }
 
@@ -321,6 +325,7 @@ type productVariables struct {
 
 	TargetFSConfigGen []string `json:",omitempty"`
 
+<<<<<<< HEAD
 	MissingUsesLibraries []string `json:",omitempty"`
 
 	EnforceProductPartitionInterface *bool `json:",omitempty"`
@@ -328,6 +333,10 @@ type productVariables struct {
 	InstallExtraFlattenedApexes *bool `json:",omitempty"`
 
 	BoardUsesRecoveryAsBoot *bool `json:",omitempty"`
+=======
+	// include Statix variables
+	*android.ProductVariables
+>>>>>>> c4e401a1c... soong: Extend with statix board flags
 }
 
 func boolPtr(v bool) *bool {
