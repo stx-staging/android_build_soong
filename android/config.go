@@ -1057,3 +1057,15 @@ func (c *config) ProductHiddenAPIStubsTest() []string {
 func (c *deviceConfig) TargetFSConfigGen() []string {
 	return c.config.productVariables.TargetFSConfigGen
 }
+
+func (c *deviceConfig) QTIAudioPath() string {
+	return String(c.config.productVariables.QTIAudioPath)
+}
+
+func (c *deviceConfig) QTIDisplayPath() string {
+	return String(c.config.productVariables.QTIDisplayPath)
+}
+
+func (c *deviceConfig) QTIMediaPath() string {
+	return String(c.config.productVariables.QTIMediaPath)
+}
