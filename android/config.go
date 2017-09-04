@@ -1059,13 +1059,13 @@ func (c *deviceConfig) TargetFSConfigGen() []string {
 }
 
 func (c *deviceConfig) QTIAudioPath() string {
-	return String(c.config.productVariables.QTIAudioPath)
+	return String(c.config.productVariables.Statix.QTIAudioPath)
 }
 
 func (c *deviceConfig) QTIDisplayPath() string {
-	return String(c.config.productVariables.QTIDisplayPath)
+	return String(c.config.productVariables.Statix.QTIDisplayPath)
 }
 
 func (c *deviceConfig) QTIMediaPath() string {
-	return String(c.config.productVariables.QTIMediaPath)
+	return String(c.config.productVariables.Statix.QTIMediaPath)
 }
