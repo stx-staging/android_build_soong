@@ -325,7 +325,6 @@ type productVariables struct {
 
 	TargetFSConfigGen []string `json:",omitempty"`
 
-<<<<<<< HEAD
 	MissingUsesLibraries []string `json:",omitempty"`
 
 	EnforceProductPartitionInterface *bool `json:",omitempty"`
@@ -333,10 +332,9 @@ type productVariables struct {
 	InstallExtraFlattenedApexes *bool `json:",omitempty"`
 
 	BoardUsesRecoveryAsBoot *bool `json:",omitempty"`
-=======
+
 	// include Statix variables
 	*android.ProductVariables
->>>>>>> c4e401a1c... soong: Extend with statix board flags
 }
 
 func boolPtr(v bool) *bool {
@@ -406,15 +404,25 @@ func VariableMutator(mctx BottomUpMutatorContext) {
 	}
 
 	variableValues := reflect.ValueOf(a.variableProperties).Elem().FieldByName("Product_variables")
+	valStruct := reflect.ValueOf(mctx.Config().productVariables)
 
+	doVariableMutation(mctx, a, variableValues, zeroValues, valStruct)
+
+}
+
+func doVariableMutation(mctx BottomUpMutatorContext, a *ModuleBase, variableValues reflect.Value, zeroValues reflect.Value,
+	valStruct reflect.Value) {
 	for i := 0; i < variableValues.NumField(); i++ {
 		variableValue := variableValues.Field(i)
 		name := variableValues.Type().Field(i).Name
 		property := "product_variables." + proptools.PropertyNameForField(name)
 
 		// Check that the variable was set for the product
-		val := reflect.ValueOf(mctx.Config().productVariables).FieldByName(name)
-		if !val.IsValid() || val.Kind() != reflect.Ptr || val.IsNil() {
+		val := valStruct.FieldByName(name)
+		if val.IsValid() && val.Kind() == reflect.Struct {
+			doVariableMutation(mctx, a, variableValue, zeroValue, val)
+			continue
+		} else if !val.IsValid() || val.Kind() != reflect.Ptr || val.IsNil() {
 			continue
 		}
 
