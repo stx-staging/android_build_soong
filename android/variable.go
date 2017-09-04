@@ -134,7 +134,7 @@ type variableProperties struct {
 			Exclude_srcs []string `android:"arch_variant"`
 		} `android:"arch_variant"`
 		// include Statix variables
-		*android.Product_variables
+		Statix android.Product_variables
 	} `android:"arch_variant"`
 }
 
@@ -334,7 +334,7 @@ type productVariables struct {
 	BoardUsesRecoveryAsBoot *bool `json:",omitempty"`
 
 	// include Statix variables
-	*android.ProductVariables
+	Statix android.ProductVariables
 }
 
 func boolPtr(v bool) *bool {
