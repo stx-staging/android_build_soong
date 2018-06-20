@@ -125,6 +125,16 @@ type variableProperties struct {
 			Srcs         []string
 		}
 
+		Supports_hw_fde struct {
+			Cflags []string
+			Header_libs []string
+			Shared_libs []string
+		}
+
+		Supports_hw_fde_perf struct {
+			Cflags []string
+		}
+
 		Additional_gralloc_10_usage_bits struct {
 			Cppflags []string
 		}
@@ -301,6 +311,9 @@ type productVariables struct {
 	TargetFSConfigGen []string `json:",omitempty"`
 
 	Target_shim_libs *string `json:",omitempty"`
+
+	Supports_hw_fde  *bool `json:",omitempty"`
+	Supports_hw_fde_perf  *bool `json:",omitempty"`
 
 	Additional_gralloc_10_usage_bits  *string `json:",omitempty"`
       Target_init_vendor_lib  *string `json:",omitempty"`
