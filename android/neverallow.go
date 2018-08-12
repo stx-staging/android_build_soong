@@ -59,11 +59,6 @@ func createNeverAllows() []*rule {
 func createTrebleRules() []*rule {
 	return []*rule{
 		neverallow().
-			in("vendor", "device").
-			with("vndk.enabled", "true").
-			without("vendor", "true").
-			because("the VNDK can never contain a library that is device dependent."),
-		neverallow().
 			with("vndk.enabled", "true").
 			without("vendor", "true").
 			without("owner", "").

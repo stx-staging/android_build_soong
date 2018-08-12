@@ -26,34 +26,6 @@ var neverallowTests = []struct {
 	expectedError string
 }{
 	{
-		name: "no vndk.enabled under vendor directory",
-		fs: map[string][]byte{
-			"vendor/Blueprints": []byte(`
-				cc_library {
-					name: "libvndk",
-					vendor_available: true,
-					vndk: {
-						enabled: true,
-					},
-				}`),
-		},
-		expectedError: "VNDK can never contain a library that is device dependent",
-	},
-	{
-		name: "no vndk.enabled under device directory",
-		fs: map[string][]byte{
-			"device/Blueprints": []byte(`
-				cc_library {
-					name: "libvndk",
-					vendor_available: true,
-					vndk: {
-						enabled: true,
-					},
-				}`),
-		},
-		expectedError: "VNDK can never contain a library that is device dependent",
-	},
-	{
 		name: "vndk-ext under vendor or device directory",
 		fs: map[string][]byte{
 			"device/Blueprints": []byte(`
