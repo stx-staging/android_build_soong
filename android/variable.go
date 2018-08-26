@@ -125,6 +125,10 @@ type variableProperties struct {
 			Srcs         []string
 		}
 
+		Additional_gralloc_10_usage_bits struct {
+			Cppflags []string
+		}
+
 		Target_shim_libs struct {
 			Cppflags []string
 		}
@@ -293,6 +297,9 @@ type productVariables struct {
 	TargetFSConfigGen []string `json:",omitempty"`
 
 	Target_shim_libs *string `json:",omitempty"`
+
+	Additional_gralloc_10_usage_bits  *string `json:",omitempty"`
+
 }
 
 func boolPtr(v bool) *bool {
