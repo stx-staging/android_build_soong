@@ -125,6 +125,10 @@ type variableProperties struct {
 			Srcs         []string
 		}
 
+		Should_skip_waiting_for_qsee struct {
+			Cflags []string
+		}
+
 		Supports_hw_fde struct {
 			Cflags []string
 			Header_libs []string
@@ -312,6 +316,7 @@ type productVariables struct {
 
 	Target_shim_libs *string `json:",omitempty"`
 
+	Should_skip_waiting_for_qsee  *bool `json:",omitempty"`
 	Supports_hw_fde  *bool `json:",omitempty"`
 	Supports_hw_fde_perf  *bool `json:",omitempty"`
 
