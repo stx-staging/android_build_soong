@@ -41,6 +41,7 @@ var (
 	sandboxesRoot string
 	manifestFile  string
 	keepOutDir    bool
+	copyAllOutput bool
 )
 
 const (
@@ -55,6 +56,8 @@ func init() {
 		"textproto manifest describing the sandboxed command(s)")
 	flag.BoolVar(&keepOutDir, "keep-out-dir", false,
 		"whether to keep the sandbox directory when done")
+	flag.BoolVar(&copyAllOutput, "copy-all-output", false,
+		"whether to copy all output files")
 }
 
 func usageViolation(violation string) {
@@ -303,7 +306,7 @@ func runCommand(command *sbox_proto.Command, tempDir string) (depFile string, er
 
 	missingOutputErrors := validateOutputFiles(command.CopyAfter, tempDir)
 
-	if len(missingOutputErrors) > 0 {
+	if !copyAllOutput && len(missingOutputErrors) > 0 {
 		// find all created files for making a more informative error message
 		createdFiles := findAllFilesUnder(tempDir)
 
@@ -523,12 +526,31 @@ func applyPathMappings(pathMappings []*sbox_proto.PathMapping, path string) stri
 	return path
 }
 
+func genCopyRule(filePathLst []string, fromDir string) []*sbox_proto.Copy {
+	var ret []*sbox_proto.Copy
+	for _, filePath := range filePathLst {
+		tempPath := joinPath(fromDir, filePath)
+		destPath := filePath
+		copyObj := new(sbox_proto.Copy)
+		copyObj.From := tempPath
+		copyObj.To := destPath
+		append(ret,copyObj)
+	}
+	return ret
+}
+
 // moveFiles moves files specified by a set of copy rules.  It uses os.Rename, so it is restricted
 // to moving files where the source and destination are in the same filesystem.  This is OK for
 // sbox because the temporary directory is inside the out directory.  It updates the timestamp
 // of the new file.
 func moveFiles(copies []*sbox_proto.Copy, fromDir, toDir string) error {
-	for _, copyPair := range copies {
+	var filePathList []string
+	if copyAllOutput {
+		filePathList = genCopyRule(findAllFilesUnder(fromDir), fromDir)
+	} else {
+		filePathList = copies
+	}
+	for _, copyPair := range filePathList {
 		fromPath := joinPath(fromDir, copyPair.GetFrom())
 		toPath := joinPath(toDir, copyPair.GetTo())
 		err := os.MkdirAll(filepath.Dir(toPath), 0777)
