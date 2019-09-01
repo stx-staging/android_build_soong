@@ -429,8 +429,10 @@ func InitDroiddocModule(module android.DefaultableModule, hod android.HostOrDevi
 	android.InitDefaultableModule(module)
 }
 
-func apiCheckEnabled(apiToCheck ApiToCheck, apiVersionTag string) bool {
-	if String(apiToCheck.Api_file) != "" && String(apiToCheck.Removed_api_file) != "" {
+func apiCheckEnabled(ctx android.ModuleContext, apiToCheck ApiToCheck, apiVersionTag string) bool {
+	if ctx.Config().IsEnvTrue("WITHOUT_CHECK_API") {
+		return false
+	} else if String(apiToCheck.Api_file) != "" && String(apiToCheck.Removed_api_file) != "" {
 		return true
 	} else if String(apiToCheck.Api_file) != "" {
 		panic("for " + apiVersionTag + " removed_api_file has to be non-empty!")
@@ -993,8 +995,8 @@ func (d *Droiddoc) collectDoclavaDocsFlags(ctx android.ModuleContext, implicits 
 func (d *Droiddoc) collectStubsFlags(ctx android.ModuleContext,
 	implicitOutputs *android.WritablePaths) string {
 	var doclavaFlags string
-	if apiCheckEnabled(d.properties.Check_api.Current, "current") ||
-		apiCheckEnabled(d.properties.Check_api.Last_released, "last_released") ||
+	if apiCheckEnabled(ctx, d.properties.Check_api.Current, "current") ||
+		apiCheckEnabled(ctx, d.properties.Check_api.Last_released, "last_released") ||
 		String(d.properties.Api_filename) != "" {
 		d.apiFile = android.PathForModuleOut(ctx, ctx.ModuleName()+"_api.txt")
 		doclavaFlags += " -api " + d.apiFile.String()
@@ -1002,8 +1004,8 @@ func (d *Droiddoc) collectStubsFlags(ctx android.ModuleContext,
 		d.apiFilePath = d.apiFile
 	}
 
-	if apiCheckEnabled(d.properties.Check_api.Current, "current") ||
-		apiCheckEnabled(d.properties.Check_api.Last_released, "last_released") ||
+	if apiCheckEnabled(ctx, d.properties.Check_api.Current, "current") ||
+		apiCheckEnabled(ctx, d.properties.Check_api.Last_released, "last_released") ||
 		String(d.properties.Removed_api_filename) != "" {
 		d.removedApiFile = android.PathForModuleOut(ctx, ctx.ModuleName()+"_removed.txt")
 		doclavaFlags += " -removedApi " + d.removedApiFile.String()
@@ -1183,7 +1185,7 @@ func (d *Droiddoc) GenerateAndroidBuildActions(ctx android.ModuleContext) {
 			flags.postDoclavaCmds)
 	}
 
-	if apiCheckEnabled(d.properties.Check_api.Current, "current") &&
+	if apiCheckEnabled(ctx, d.properties.Check_api.Current, "current") &&
 		!ctx.Config().IsPdkBuild() {
 		apiFile := ctx.ExpandSource(String(d.properties.Check_api.Current.Api_file),
 			"check_api.current.api_file")
@@ -1209,7 +1211,7 @@ func (d *Droiddoc) GenerateAndroidBuildActions(ctx android.ModuleContext) {
 			d.updateCurrentApiTimestamp)
 	}
 
-	if apiCheckEnabled(d.properties.Check_api.Last_released, "last_released") &&
+	if apiCheckEnabled(ctx, d.properties.Check_api.Last_released, "last_released") &&
 		!ctx.Config().IsPdkBuild() {
 		apiFile := ctx.ExpandSource(String(d.properties.Check_api.Last_released.Api_file),
 			"check_api.last_released.api_file")
@@ -1336,8 +1338,8 @@ func (d *Droidstubs) initBuilderFlags(ctx android.ModuleContext, implicits *andr
 func (d *Droidstubs) collectStubsFlags(ctx android.ModuleContext,
 	implicitOutputs *android.WritablePaths) string {
 	var metalavaFlags string
-	if apiCheckEnabled(d.properties.Check_api.Current, "current") ||
-		apiCheckEnabled(d.properties.Check_api.Last_released, "last_released") ||
+	if apiCheckEnabled(ctx, d.properties.Check_api.Current, "current") ||
+		apiCheckEnabled(ctx, d.properties.Check_api.Last_released, "last_released") ||
 		String(d.properties.Api_filename) != "" {
 		d.apiFile = android.PathForModuleOut(ctx, ctx.ModuleName()+"_api.txt")
 		metalavaFlags = metalavaFlags + " --api " + d.apiFile.String()
@@ -1345,8 +1347,8 @@ func (d *Droidstubs) collectStubsFlags(ctx android.ModuleContext,
 		d.apiFilePath = d.apiFile
 	}
 
-	if apiCheckEnabled(d.properties.Check_api.Current, "current") ||
-		apiCheckEnabled(d.properties.Check_api.Last_released, "last_released") ||
+	if apiCheckEnabled(ctx, d.properties.Check_api.Current, "current") ||
+		apiCheckEnabled(ctx, d.properties.Check_api.Last_released, "last_released") ||
 		String(d.properties.Removed_api_filename) != "" {
 		d.removedApiFile = android.PathForModuleOut(ctx, ctx.ModuleName()+"_removed.txt")
 		metalavaFlags = metalavaFlags + " --removed-api " + d.removedApiFile.String()
@@ -1683,7 +1685,7 @@ func (d *Droidstubs) GenerateAndroidBuildActions(ctx android.ModuleContext) {
 		flags.metalavaStubsFlags+flags.metalavaAnnotationsFlags+flags.metalavaInclusionAnnotationsFlags+
 			flags.metalavaApiLevelsAnnotationsFlags+flags.metalavaApiToXmlFlags+" "+d.Javadoc.args)
 
-	if apiCheckEnabled(d.properties.Check_api.Current, "current") &&
+	if apiCheckEnabled(ctx, d.properties.Check_api.Current, "current") &&
 		!ctx.Config().IsPdkBuild() {
 		apiFile := ctx.ExpandSource(String(d.properties.Check_api.Current.Api_file),
 			"check_api.current.api_file")
@@ -1720,7 +1722,7 @@ func (d *Droidstubs) GenerateAndroidBuildActions(ctx android.ModuleContext) {
 			d.updateCurrentApiTimestamp)
 	}
 
-	if apiCheckEnabled(d.properties.Check_api.Last_released, "last_released") &&
+	if apiCheckEnabled(ctx, d.properties.Check_api.Last_released, "last_released") &&
 		!ctx.Config().IsPdkBuild() {
 		apiFile := ctx.ExpandSource(String(d.properties.Check_api.Last_released.Api_file),
 			"check_api.last_released.api_file")
