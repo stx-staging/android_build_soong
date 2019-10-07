@@ -53,6 +53,7 @@ func TestDexpreoptBootJars(t *testing.T) {
 
 	ctx := testContext()
 
+        ctx.PreArchMutators(android.RegisterBootJarMutators)
 	ctx.RegisterSingletonType("dex_bootjars", dexpreoptBootJarsFactory)
 
 	run(t, ctx, config)
