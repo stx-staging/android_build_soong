@@ -125,7 +125,7 @@ type variableProperties struct {
 			Srcs         []string
 		}
 
-		Should_skip_waiting_for_qsee struct {
+		Should_wait_for_qsee struct {
 			Cflags []string
 		}
 
