@@ -1419,6 +1419,8 @@ func modulePartition(ctx ModuleInstallPathContext, os OsType) string {
 			}
 		} else if ctx.SocSpecific() {
 			partition = ctx.DeviceConfig().VendorPath()
+	        } else if ctx.VendorOverlay() {
+			partition = ctx.DeviceConfig().VendorOverlayPath()
 		} else if ctx.DeviceSpecific() {
 			partition = ctx.DeviceConfig().OdmPath()
 		} else if ctx.ProductSpecific() {

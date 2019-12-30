@@ -75,6 +75,7 @@ type EarlyModuleContext interface {
 
 	DeviceSpecific() bool
 	SocSpecific() bool
+	VendorOverlay() bool
 	ProductSpecific() bool
 	SystemExtSpecific() bool
 	Platform() bool
@@ -440,6 +441,10 @@ type commonProperties struct {
 	// Use `soc_specific` instead for better meaning.
 	Vendor *bool
 
+	// whether this module is specific to an SoC (System-On-a-Chip) and the build is system-only.
+	// When set to true, it is installed into $(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)
+        Vendor_overlay *bool
+
 	// whether this module is specific to an SoC (System-On-a-Chip). When set to true,
 	// it is installed into /vendor (or /system/vendor if vendor partition does not exist).
 	Soc_specific *bool
@@ -617,6 +622,7 @@ const (
 	platformModule moduleKind = iota
 	deviceSpecificModule
 	socSpecificModule
+	vendorOverlayModule
 	productSpecificModule
 	systemExtSpecificModule
 )
@@ -629,6 +635,8 @@ func (k moduleKind) String() string {
 		return "device-specific"
 	case socSpecificModule:
 		return "soc-specific"
+	case vendorOverlayModule:
+		return "vendor-overlay"
 	case productSpecificModule:
 		return "product-specific"
 	case systemExtSpecificModule:
@@ -959,7 +967,7 @@ func (m *ModuleBase) HostSupported() bool {
 }
 
 func (m *ModuleBase) Platform() bool {
-	return !m.DeviceSpecific() && !m.SocSpecific() && !m.ProductSpecific() && !m.SystemExtSpecific()
+	return !m.DeviceSpecific() && !m.SocSpecific() && !m.ProductSpecific() && !m.SystemExtSpecific() && !m.VendorOverlay()
 }
 
 func (m *ModuleBase) DeviceSpecific() bool {
@@ -972,6 +980,10 @@ func (m *ModuleBase) SocSpecific() bool {
 
 func (m *ModuleBase) ProductSpecific() bool {
 	return Bool(m.commonProperties.Product_specific)
+}
+
+func (m *ModuleBase) VendorOverlay() bool {
+	return Bool(m.commonProperties.Vendor_overlay)
 }
 
 func (m *ModuleBase) SystemExtSpecific() bool {
@@ -1196,6 +1208,7 @@ func (m *ModuleBase) generateModuleTarget(ctx ModuleContext) {
 
 func determineModuleKind(m *ModuleBase, ctx blueprint.EarlyModuleContext) moduleKind {
 	var socSpecific = Bool(m.commonProperties.Vendor) || Bool(m.commonProperties.Proprietary) || Bool(m.commonProperties.Soc_specific)
+	var vendorOverlay = Bool(m.commonProperties.Vendor_overlay)
 	var deviceSpecific = Bool(m.commonProperties.Device_specific)
 	var productSpecific = Bool(m.commonProperties.Product_specific)
 	var systemExtSpecific = Bool(m.commonProperties.System_ext_specific)
@@ -1211,6 +1224,9 @@ func determineModuleKind(m *ModuleBase, ctx blueprint.EarlyModuleContext) module
 		}
 		if Bool(m.commonProperties.Soc_specific) {
 			ctx.PropertyErrorf("soc_specific", msg)
+		}
+		if Bool(m.commonProperties.Vendor_overlay) {
+			ctx.PropertyErrorf("vendor_overlay", msg)
 		}
 	}
 
@@ -1237,6 +1253,9 @@ func determineModuleKind(m *ModuleBase, ctx blueprint.EarlyModuleContext) module
 			if Bool(m.commonProperties.Soc_specific) {
 				ctx.PropertyErrorf("soc_specific", msg)
 			}
+			if Bool(m.commonProperties.Vendor_overlay) {
+				ctx.PropertyErrorf("vendor_overlay", msg)
+			}
 		}
 	}
 
@@ -1246,6 +1265,8 @@ func determineModuleKind(m *ModuleBase, ctx blueprint.EarlyModuleContext) module
 		return systemExtSpecificModule
 	} else if deviceSpecific {
 		return deviceSpecificModule
+	} else if vendorOverlay {
+		return vendorOverlayModule
 	} else if socSpecific {
 		return socSpecificModule
 	} else {
@@ -1472,6 +1493,10 @@ func (e *earlyModuleContext) ProductSpecific() bool {
 
 func (e *earlyModuleContext) SystemExtSpecific() bool {
 	return e.kind == systemExtSpecificModule
+}
+
+func (e *earlyModuleContext) VendorOverlay() bool {
+	return e.kind == vendorOverlayModule
 }
 
 type baseModuleContext struct {
@@ -1936,6 +1961,7 @@ func (m *ModuleBase) MakeAsPlatform() {
 	m.commonProperties.Soc_specific = boolPtr(false)
 	m.commonProperties.Product_specific = boolPtr(false)
 	m.commonProperties.System_ext_specific = boolPtr(false)
+	m.commonProperties.Vendor_overlay = boolPtr(false)
 }
 
 func (m *ModuleBase) EnableNativeBridgeSupportByDefault() {
@@ -1948,6 +1974,7 @@ func (m *ModuleBase) MakeAsSystemExt() {
 	m.commonProperties.Soc_specific = boolPtr(false)
 	m.commonProperties.Product_specific = boolPtr(false)
 	m.commonProperties.System_ext_specific = boolPtr(true)
+	m.commonProperties.Vendor_overlay = boolPtr(false)
 }
 
 // IsNativeBridgeSupported returns true if "native_bridge_supported" is explicitly set as "true"
