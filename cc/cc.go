@@ -2948,7 +2948,7 @@ var _ android.ImageInterface = (*Module)(nil)
 
 func (m *Module) ImageMutatorBegin(mctx android.BaseModuleContext) {
 	// Sanity check
-	vendorSpecific := mctx.SocSpecific() || mctx.DeviceSpecific()
+	vendorSpecific := mctx.SocSpecific() || mctx.DeviceSpecific() || mctx.VendorOverlay()
 	productSpecific := mctx.ProductSpecific()
 
 	if m.VendorProperties.Vendor_available != nil && vendorSpecific {
