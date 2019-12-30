@@ -263,7 +263,7 @@ func (m *Module) ImageMutatorBegin(mctx android.BaseModuleContext) {
 // CheckVndkProperties checks whether the VNDK-related properties are set correctly.
 // If properties are not set correctly, results in a module context property error.
 func (m *Module) CheckVndkProperties(mctx android.BaseModuleContext) {
-	vendorSpecific := mctx.SocSpecific() || mctx.DeviceSpecific()
+	vendorSpecific := mctx.SocSpecific() || mctx.DeviceSpecific() || mctx.VendorOverlay()
 	productSpecific := mctx.ProductSpecific()
 
 	if vndkdep := m.vndkdep; vndkdep != nil {
