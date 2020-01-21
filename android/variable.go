@@ -146,9 +146,13 @@ type variableProperties struct {
 		Target_shim_libs struct {
 			Cppflags []string
 		}
-              Target_init_vendor_lib struct {
-                  Whole_static_libs []string
-              }
+		Target_init_vendor_lib struct {
+			Whole_static_libs []string
+		}
+		Uses_qti_camera_device struct {
+			Cppflags []string
+			Shared_libs []string
+		}
 
 	} `android:"arch_variant"`
 }
@@ -321,7 +325,8 @@ type productVariables struct {
 	Supports_hw_fde_perf  *bool `json:",omitempty"`
 
 	Additional_gralloc_10_usage_bits  *string `json:",omitempty"`
-      Target_init_vendor_lib  *string `json:",omitempty"`
+	Target_init_vendor_lib  *string `json:",omitempty"`
+	Uses_qti_camera_device  *bool `json:",omitempty"`
 }
 
 func boolPtr(v bool) *bool {
