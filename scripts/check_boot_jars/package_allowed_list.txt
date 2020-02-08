@@ -212,3 +212,7 @@ com\.google\.wear\..*
 # Packages used for display offload in Wear OS
 vendor\.google_clockwork\.displayoffload3
 vendor\.google_clockwork\.displayoffload3\..*
+
+###################################################
+# LineageOS
+vendor.lineage.touch.*
