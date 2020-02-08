@@ -268,3 +268,7 @@ org\.chromium\.arc\..*
 # Packages used for wear-sdk in Wear OS
 com\.google\.wear
 com\.google\.wear\..*
+
+###################################################
+# LineageOS
+vendor.lineage.touch.*
