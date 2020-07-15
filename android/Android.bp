@@ -9,6 +9,7 @@ bootstrap_go_package {
         "soong-env",
         "soong-shared",
         "soong-ui-metrics_proto",
+        "soong-statix",
     ],
     srcs: [
         "androidmk.go",
