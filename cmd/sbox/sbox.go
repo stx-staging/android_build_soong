@@ -532,9 +532,9 @@ func genCopyRule(filePathLst []string, fromDir string) []*sbox_proto.Copy {
 		tempPath := joinPath(fromDir, filePath)
 		destPath := filePath
 		copyObj := new(sbox_proto.Copy)
-		copyObj.From := tempPath
-		copyObj.To := destPath
-		append(ret,copyObj)
+		copyObj.From = &tempPath
+		copyObj.To = &destPath
+		ret = append(ret, copyObj)
 	}
 	return ret
 }
@@ -544,7 +544,7 @@ func genCopyRule(filePathLst []string, fromDir string) []*sbox_proto.Copy {
 // sbox because the temporary directory is inside the out directory.  It updates the timestamp
 // of the new file.
 func moveFiles(copies []*sbox_proto.Copy, fromDir, toDir string) error {
-	var filePathList []string
+	var filePathList []*sbox_proto.Copy
 	if copyAllOutput {
 		filePathList = genCopyRule(findAllFilesUnder(fromDir), fromDir)
 	} else {
