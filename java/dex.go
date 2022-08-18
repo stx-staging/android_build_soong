@@ -551,7 +551,7 @@ var r8, r8RE = pctx.MultiCommandRemoteStaticRules("r8",
 			`rm -f "$outDict" && rm -f "$outConfig" && rm -rf "${outUsageDir}" && ` +
 			`mkdir -p $$(dirname ${outUsage}) && ` +
 			`PATH=${config.JavaToolchain}:$$PATH ` +
-			`$r8Template${config.R8Cmd} ${config.R8Flags} $r8Flags -injars $in --output $outDir ` +
+			`$r8Template${config.R8Cmd} -JXmx6G ${config.R8Flags} $r8Flags -injars $in --output $outDir ` +
 			`--no-data-resources ` +
 			`-printmapping ${outDict} ` +
 			`-printconfiguration ${outConfig} ` +
