@@ -97,7 +97,7 @@ func init() {
 		"-JDcom.android.tools.r8.emitPermittedSubclassesAnnotationsInDex",
 	}, dexerJavaVmFlagsList...), " "))
 	pctx.StaticVariable("R8Flags", strings.Join(append([]string{
-		"-JXmx4096M",
+		"-JXmx6G",
 		"-JDcom.android.tools.r8.emitRecordAnnotationsInDex",
 		"-JDcom.android.tools.r8.emitPermittedSubclassesAnnotationsInDex",
 	}, dexerJavaVmFlagsList...), " "))
