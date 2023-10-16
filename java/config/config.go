@@ -100,7 +100,7 @@ func init() {
 
 	pctx.VariableFunc("R8Flags", func(ctx android.PackageVarContext) string {
 		r8flags := append([]string{
-			"-JXmx4096M",
+			"-JXmx6G",
 			"-JDcom.android.tools.r8.emitRecordAnnotationsInDex",
 			"-JDcom.android.tools.r8.emitPermittedSubclassesAnnotationsInDex",
 		}, dexerJavaVmFlagsList...)
