@@ -97,7 +97,7 @@ func init() {
 		"-JDcom.android.tools.r8.emitPermittedSubclassesAnnotationsInDex",
 	}, dexerJavaVmFlagsList...))
 	exportedVars.ExportStringListStaticVariable("R8Flags", append([]string{
-		"-JXmx4096M",
+		"-JXmx6G",
 		"-JDcom.android.tools.r8.emitRecordAnnotationsInDex",
 		"-JDcom.android.tools.r8.emitPermittedSubclassesAnnotationsInDex",
 	}, dexerJavaVmFlagsList...))
