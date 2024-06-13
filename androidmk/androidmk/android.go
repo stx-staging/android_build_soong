@@ -783,6 +783,13 @@ func protoLocalIncludeDirs(ctx variableAssignmentContext) error {
 	return fmt.Errorf("Currently LOCAL_PROTOC_FLAGS only support with value '--proto_path=$(LOCAL_PATH)/...'")
 }
 
+func exportCflags(ctx variableAssignmentContext) error {
+	// The Soong replacement for EXPORT_CFLAGS doesn't need the same extra escaped quotes that were present in Make
+	ctx.mkvalue = ctx.mkvalue.Clone()
+	ctx.mkvalue.ReplaceLiteral(`\"`, `"`)
+	return includeVariableNow(bpVariable{"export_cflags", bpparser.ListType}, ctx)
+}
+
 func proguardEnabled(ctx variableAssignmentContext) error {
 	val, err := makeVariableToBlueprint(ctx.file, ctx.mkvalue, bpparser.ListType)
 	if err != nil {
