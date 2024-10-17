@@ -197,6 +197,8 @@ def generate_build_info(args):
   config = args.config
   build_flags = config["BuildFlags"]
 
+  print(f"ro.build.fingerprint?={config['BuildFingerprint']}")
+
   print(f"ro.build.id?={config['BuildId']}")
 
   # ro.build.display.id is shown under Settings -> About Phone
