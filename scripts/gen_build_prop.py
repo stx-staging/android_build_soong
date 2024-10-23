@@ -118,6 +118,14 @@ def parse_args():
   if args.build_thumbprint_file:
     config["BuildThumbprint"] = args.build_thumbprint_file.read().strip()
 
+  # Dev. branches should have DISPLAY_BUILD_NUMBER set
+  if config["DisplayBuildNumber"]:
+    config["BuildDisplayId"] = f"{config['BuildId']}.{config['BuildNumber']} {config['BuildKeys']}"
+  else:
+    config["BuildDisplayId"] = f"{config['BuildId']} {config['BuildKeys']}"
+
+  config["BuildDescOverride"] = config["BuildDesc"]
+
   override_config(config)
 
   append_additional_system_props(args)
@@ -211,13 +219,11 @@ def generate_build_info(args):
     # release build number or branch.buld_number non-release builds
 
     # Dev. branches should have DISPLAY_BUILD_NUMBER set
-    if config["DisplayBuildNumber"]:
-      print(f"ro.build.display.id?={config['BuildId']}.{config['BuildNumber']} {config['BuildKeys']}")
-    else:
-      print(f"ro.build.display.id?={config['BuildId']} {config['BuildKeys']}")
+    # This has been moved up
+    print(f"ro.build.display.id?={config['BuildDisplayId']}")
   else:
     # Non-user builds should show detailed build information (See build desc above)
-    print(f"ro.build.display.id?={config['BuildDesc']}")
+    print(f"ro.build.display.id?={config['BuildDescOverride']}")
   print(f"ro.build.version.incremental={config['BuildNumber']}")
   print(f"ro.build.version.sdk={config['Platform_sdk_version']}")
   print(f"ro.build.version.sdk_full={config['Platform_sdk_version_full']}")
