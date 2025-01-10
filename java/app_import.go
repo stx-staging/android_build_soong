@@ -61,6 +61,13 @@ var (
 		Command:     "unzip -p $in $extract_apk > $out",
 		Description: "Extract specific sub apk",
 	}, "extract_apk")
+
+	gzipRule = pctx.AndroidStaticRule("gzip",
+		blueprint.RuleParams{
+			Command:     "prebuilts/build-tools/path/linux-x86/gzip -9 -c $in > $out",
+			CommandDeps: []string{"prebuilts/build-tools/path/linux-x86/gzip"},
+			Description: "gzip $out",
+		})
 )
 
 func RegisterAppImportBuildComponents(ctx android.RegistrationContext) {
@@ -162,6 +169,9 @@ type AndroidAppImportProperties struct {
 
 	// Path of extracted apk which is extracted from prebuilt apk. Use this extracted to import.
 	Extract_apk *string
+
+	// Compress the output APK using gzip. Defaults to false.
+	Compress_apk proptools.Configurable[bool] `android:"arch_variant,replace_instead_of_append"`
 }
 
 func (a *AndroidAppImport) IsInstallable() bool {
@@ -391,7 +401,9 @@ func (a *AndroidAppImport) generateAndroidBuildActions(ctx android.ModuleContext
 
 	a.dexpreopter.enforceUsesLibs = a.usesLibrary.enforceUsesLibraries(ctx)
 	a.dexpreopter.classLoaderContexts = a.usesLibrary.classLoaderContextForUsesLibDeps(ctx)
-	if a.usesLibrary.shouldDisableDexpreopt {
+
+	// Disable Dexpreopt if Compress_apk is true. It follows the build/make/core/app_prebuilt_internal.mk
+	if a.usesLibrary.shouldDisableDexpreopt || a.properties.Compress_apk.GetOrDefault(ctx, false) {
 		a.dexpreopter.disableDexpreopt()
 	}
 
@@ -410,7 +422,13 @@ func (a *AndroidAppImport) generateAndroidBuildActions(ctx android.ModuleContext
 		jnisUncompressed = dexUncompressed
 	}
 
-	apkFilename := proptools.StringDefault(a.properties.Filename, a.BaseModuleName()+".apk")
+	defaultApkFilename := a.BaseModuleName()
+	if a.properties.Compress_apk.GetOrDefault(ctx, false) {
+		defaultApkFilename += ".apk.gz"
+	} else {
+		defaultApkFilename += ".apk"
+	}
+	apkFilename := proptools.StringDefault(a.properties.Filename, defaultApkFilename)
 
 	// TODO: Handle EXTERNAL
 
@@ -450,7 +468,16 @@ func (a *AndroidAppImport) generateAndroidBuildActions(ctx android.ModuleContext
 		a.certificate = PresignedCertificate
 	}
 
-	// TODO: Optionally compress the output apk.
+	if a.properties.Compress_apk.GetOrDefault(ctx, false) {
+		outputFile := android.PathForModuleOut(ctx, "compressed_apk", apkFilename)
+		ctx.Build(pctx, android.BuildParams{
+			Rule:        gzipRule,
+			Input:       a.outputFile,
+			Output:      outputFile,
+			Description: "Compressing " + a.outputFile.Base(),
+		})
+		a.outputFile = outputFile
+	}
 
 	if apexInfo.IsForPlatform() {
 		a.installPath = ctx.InstallFile(installDir, apkFilename, a.outputFile)
