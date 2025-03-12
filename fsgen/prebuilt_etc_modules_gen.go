@@ -164,7 +164,6 @@ type prebuiltModuleProperties struct {
 	Ramdisk             *bool
 
 	Srcs []string
-	Dsts []string
 
 	No_full_install *bool
 
@@ -357,11 +356,14 @@ func createPrebuiltEtcModulesInDirectory(ctx android.LoadHookContext, partition,
 				moduleFactory = etc.PrebuiltAnyFactory
 			}
 			modulePropsPtr.Srcs = srcBaseFiles
-			dsts := []string{}
+			dsts := proptools.NewConfigurable[[]string](nil, nil)
 			for _, installBaseFile := range installBaseFiles {
-				dsts = append(dsts, filepath.Join(relDestDirFromInstallDirBase, installBaseFile))
+				dsts.AppendSimpleValue([]string{filepath.Join(relDestDirFromInstallDirBase, installBaseFile)})
 			}
-			modulePropsPtr.Dsts = dsts
+
+			propsList = append(propsList, &etc.PrebuiltDstsProperties{
+				Dsts: dsts,
+			})
 		}
 
 		ctx.CreateModuleInDirectory(moduleFactory, srcDir, propsList...)

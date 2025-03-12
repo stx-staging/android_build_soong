@@ -105,12 +105,6 @@ type PrebuiltEtcProperties struct {
 	// set. May use globs in filenames.
 	Srcs proptools.Configurable[[]string] `android:"path,arch_variant"`
 
-	// Destination files of this prebuilt. Requires srcs to be used and causes srcs not to implicitly
-	// set filename_from_src. This can be used to install each source file to a different directory
-	// and/or change filenames when files are installed. Must be exactly one entry per source file,
-	// which means care must be taken if srcs has globs.
-	Dsts proptools.Configurable[[]string] `android:"path,arch_variant"`
-
 	// Optional name for the installed file. If unspecified, name of the module is used as the file
 	// name. Only available when using a single source (src).
 	Filename *string `android:"arch_variant"`
@@ -149,6 +143,20 @@ type PrebuiltEtcProperties struct {
 	Oem_specific *bool `android:"arch_variant"`
 }
 
+// Dsts is useful in that it allows prebuilt_* modules to easily map the source files to the
+// install path within the partition. Dsts values are allowed to contain filepath separator
+// so that the source files can be installed in subdirectories within the partition.
+// However, this functionality should not be supported for prebuilt_root module type, as it
+// allows the module to install to any arbitrary location. Thus, this property is defined in
+// a separate struct so that it's not available to be set in prebuilt_root module type.
+type PrebuiltDstsProperties struct {
+	// Destination files of this prebuilt. Requires srcs to be used and causes srcs not to implicitly
+	// set filename_from_src. This can be used to install each source file to a different directory
+	// and/or change filenames when files are installed. Must be exactly one entry per source file,
+	// which means care must be taken if srcs has globs.
+	Dsts proptools.Configurable[[]string] `android:"path,arch_variant"`
+}
+
 type prebuiltSubdirProperties struct {
 	// Optional subdirectory under which this file is installed into, cannot be specified with
 	// relative_install_path, prefer relative_install_path.
@@ -183,6 +191,8 @@ type PrebuiltEtc struct {
 	android.DefaultableModuleBase
 
 	properties PrebuiltEtcProperties
+
+	dstsProperties PrebuiltDstsProperties
 
 	// rootProperties is used to return the value of the InstallInRoot() method. Currently, only
 	// prebuilt_avb and prebuilt_root modules use this.
@@ -374,7 +384,7 @@ func (p *PrebuiltEtc) GenerateAndroidBuildActions(ctx android.ModuleContext) {
 	if srcProperty.IsPresent() && len(srcsProperty) > 0 {
 		ctx.PropertyErrorf("src", "src is set. Cannot set srcs")
 	}
-	dstsProperty := p.properties.Dsts.GetOrDefault(ctx, nil)
+	dstsProperty := p.dstsProperties.Dsts.GetOrDefault(ctx, nil)
 	if len(dstsProperty) > 0 && len(srcsProperty) == 0 {
 		ctx.PropertyErrorf("dsts", "dsts is set. Must use srcs")
 	}
@@ -581,6 +591,7 @@ func InitPrebuiltEtcModule(p *PrebuiltEtc, dirBase string) {
 	p.AddProperties(&p.properties)
 	p.AddProperties(&p.subdirProperties)
 	p.AddProperties(&p.rootProperties)
+	p.AddProperties(&p.dstsProperties)
 }
 
 func InitPrebuiltRootModule(p *PrebuiltEtc) {
@@ -592,6 +603,7 @@ func InitPrebuiltRootModule(p *PrebuiltEtc) {
 func InitPrebuiltAvbModule(p *PrebuiltEtc) {
 	p.installDirBase = "avb"
 	p.AddProperties(&p.properties)
+	p.AddProperties(&p.dstsProperties)
 	p.rootProperties.Install_in_root = proptools.BoolPtr(true)
 }
 

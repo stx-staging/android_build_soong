@@ -349,15 +349,25 @@ func TestPrebuiltEtcModuleGen(t *testing.T) {
 	eval := generatedModule0.ConfigurableEvaluator(android.PanickingConfigAndErrorContext(result.TestContext))
 	android.AssertBoolEquals(
 		t,
-		"module expected to set correct srcs and dsts properties",
+		"module expected to set correct srcs property",
 		true,
 		checkModuleProp(generatedModule0, func(actual interface{}) bool {
 			if p, ok := actual.(*etc.PrebuiltEtcProperties); ok {
 				srcs := p.Srcs.GetOrDefault(eval, nil)
-				dsts := p.Dsts.GetOrDefault(eval, nil)
 				return len(srcs) == 1 &&
-					srcs[0] == "apns-full-conf.xml" &&
-					len(dsts) == 1 &&
+					srcs[0] == "apns-full-conf.xml"
+			}
+			return false
+		}),
+	)
+	android.AssertBoolEquals(
+		t,
+		"module expected to set correct dsts property",
+		true,
+		checkModuleProp(generatedModule0, func(actual interface{}) bool {
+			if p, ok := actual.(*etc.PrebuiltDstsProperties); ok {
+				dsts := p.Dsts.GetOrDefault(eval, nil)
+				return len(dsts) == 1 &&
 					dsts[0] == "apns-conf.xml"
 			}
 			return false
@@ -368,15 +378,25 @@ func TestPrebuiltEtcModuleGen(t *testing.T) {
 	eval = generatedModule1.ConfigurableEvaluator(android.PanickingConfigAndErrorContext(result.TestContext))
 	android.AssertBoolEquals(
 		t,
-		"module expected to set correct srcs and dsts properties",
+		"module expected to set correct srcs property",
 		true,
 		checkModuleProp(generatedModule1, func(actual interface{}) bool {
 			if p, ok := actual.(*etc.PrebuiltEtcProperties); ok {
 				srcs := p.Srcs.GetOrDefault(eval, nil)
-				dsts := p.Dsts.GetOrDefault(eval, nil)
 				return len(srcs) == 1 &&
-					srcs[0] == "apns-full-conf.xml" &&
-					len(dsts) == 1 &&
+					srcs[0] == "apns-full-conf.xml"
+			}
+			return false
+		}),
+	)
+	android.AssertBoolEquals(
+		t,
+		"module expected to set correct dsts property",
+		true,
+		checkModuleProp(generatedModule1, func(actual interface{}) bool {
+			if p, ok := actual.(*etc.PrebuiltDstsProperties); ok {
+				dsts := p.Dsts.GetOrDefault(eval, nil)
+				return len(dsts) == 1 &&
 					dsts[0] == "apns-conf-2.xml"
 			}
 			return false
