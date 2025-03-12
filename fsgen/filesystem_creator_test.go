@@ -271,6 +271,8 @@ func TestPrebuiltEtcModuleGen(t *testing.T) {
 				"some/non/existing/file.txt:system/etc/file.txt",
 				"device/sample/etc/apns-full-conf.xml:product/etc/apns-conf.xml:google",
 				"device/sample/etc/apns-full-conf.xml:product/etc/apns-conf-2.xml",
+				"device/sample/etc/apns-full-conf.xml:system/foo/file.txt",
+				"device/sample/etc/apns-full-conf.xml:system/foo/apns-full-conf.xml",
 			}
 			config.TestProductVariables.PartitionVarsForSoongMigrationOnlyDoNotUse.PartitionQualifiedVariables =
 				map[string]android.PartitionQualifiedVariablesType{
