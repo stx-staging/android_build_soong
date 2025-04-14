@@ -85,6 +85,7 @@ func RegisterPrebuiltEtcBuildComponents(ctx android.RegistrationContext) {
 	ctx.RegisterModuleType("prebuilt_sbin", PrebuiltSbinFactory)
 	ctx.RegisterModuleType("prebuilt_system", PrebuiltSystemFactory)
 	ctx.RegisterModuleType("prebuilt_first_stage_ramdisk", PrebuiltFirstStageRamdiskFactory)
+	ctx.RegisterModuleType("prebuilt_any", PrebuiltAnyFactory)
 
 	ctx.RegisterModuleType("prebuilt_defaults", defaultsFactory)
 
@@ -620,6 +621,20 @@ func DefaultsFactory(props ...interface{}) android.Module {
 
 	return module
 }
+
+// prebuilt_any is a special module where the module can define the subdirectory that the files
+  // are installed to. This is only used for converting the PRODUCT_COPY_FILES entries to Soong
+  // modules, and should never be defined in the bp files. If none of the existing prebuilt_*
+  // modules allow installing the file at the desired location, introduce a new prebuilt_* module
+  // type instead.
+  func PrebuiltAnyFactory() android.Module {
+  	module := &PrebuiltEtc{}
+  	InitPrebuiltEtcModule(module, ".")
+  	// This module is device-only
+  	android.InitAndroidArchModule(module, android.DeviceSupported, android.MultilibCommon)
+  	android.InitDefaultableModule(module)
+  	return module
+  }
 
 // prebuilt_etc_host is for a host prebuilt artifact that is installed in
 // $(HOST_OUT)/etc/<sub_dir> directory.
