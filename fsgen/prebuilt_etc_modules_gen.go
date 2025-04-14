@@ -338,9 +338,22 @@ func createPrebuiltEtcModulesInDirectory(ctx android.LoadHookContext, partition,
 
 		// Set appropriate srcs, dsts, and releative_install_path based on
 		// the source and install file names
-		if allCopyFileNamesUnchanged {
-			modulePropsPtr.Srcs = srcBaseFiles
+		modulePropsPtr.Srcs = srcBaseFiles
 
+  		// prebuilt_root should only be used in very limited cases in prebuilt_etc moddule gen, where:
+  		// - all source file names are identical to the installed file names, and
+  		// - all source files are installed in root, not the subdirectories of root
+  		// prebuilt_root currently does not have a good way to specify the names of the multiple
+  		// installed files, and prebuilt_root does not allow installing files at a subdirectory
+  		// of the root.
+  		// Use prebuilt_any instead of prebuilt_root if either of the conditions are not met as
+  		// a fallback behavior.
+  		if etcInstallPathKey == "" {
+  			if !(allCopyFileNamesUnchanged && android.InList(relDestDirFromInstallDirBase, []string{"", "."})) {
+  				moduleFactory = etc.PrebuiltAnyFactory
+  			}
+  		}
+		if allCopyFileNamesUnchanged {
 			// Specify relative_install_path if it is not installed in the root directory of the
 			// partition
 			if !android.InList(relDestDirFromInstallDirBase, []string{"", "."}) {
@@ -351,10 +364,6 @@ func createPrebuiltEtcModulesInDirectory(ctx android.LoadHookContext, partition,
 		} else {
 			// If dsts property has to be set and the selected module type is prebuilt_root,
   			// use prebuilt_any instead.
-  			if etcInstallPathKey == "" {
-  				moduleFactory = etc.PrebuiltAnyFactory
-  			}
-			modulePropsPtr.Srcs = srcBaseFiles
 			dsts := []string{}
 			for _, installBaseFile := range installBaseFiles {
 				dsts = append(dsts, filepath.Join(relDestDirFromInstallDirBase, installBaseFile))
